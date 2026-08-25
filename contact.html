@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Me | Hadis Pazhand</title>
+    <meta name="description" content="Get in touch with Hadis Pazhand for cybersecurity opportunities, collaborations, or questions." />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="site-header">
+  <div class="container header-inner">
+    <div class="brand">
+      <h1>Hadis Pazhand</h1>
+      <p class="subtitle">Cybersecurity Student & IT Enthusiast</p>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="siteNav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="projects.html" class="nav-link">Projects</a>
+      <a href="contact.html" class="nav-link active">Contact</a>
+    </nav>
+  </div>
+</header>
+
+    <!-- Main -->
+    <main class="container">
+      <h2>Contact Me</h2>
+      <p>If you'd like to get in touch, please fill out the form below:</p>
+
+      <form class="contact-form" action="https://formspree.io/f/mgawweld" method="POST">
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" name="name" required />
+
+        <label for="email">Your Email:</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+
+        <button type="submit">Send</button>
+      </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2025 Hadis Pazhand</p>
+        <div class="social-links">
+          <a href="https://github.com/HadisPazhand" target="_blank">GitHub</a> |
+          <a href="https://www.linkedin.com/in/hadis-pazhand-5264311b1/" target="_blank">LinkedIn</a> |
+          <a href="https://www.instagram.com" target="_blank">Instagram</a>
+        </div>
+      </div>
+    </footer>
+  
+    <script>
+      const navToggle = document.getElementById('navToggle');
+      const siteNav = document.getElementById('siteNav');
+      if (navToggle && siteNav) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = siteNav.classList.toggle('nav-open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    </script>
+  </body>
+</html>

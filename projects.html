@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Projects | Hadis Pazhand</title>
+    <meta name="description" content="Cybersecurity projects by Hadis Pazhand — penetration testing case studies, digital forensics, SOC/SIEM detection labs, and hands-on security work." />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <h1>Hadis Pazhand</h1>
+          <p class="subtitle">Cybersecurity Student & IT Enthusiast</p>
+        </div>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="siteNav">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="about.html" class="nav-link">About</a>
+          <a href="projects.html" class="nav-link active">Projects</a>
+          <a href="contact.html" class="nav-link">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <h2 class="page-title">Projects</h2>
+      <p class="page-intro">
+        Hands-on offensive and defensive security labs — from full penetration
+        testing engagements to SOC-style detection builds and digital forensics
+        casework. Each write-up covers the real methodology, tools, and evidence
+        behind the result.
+      </p>
+
+      <!-- Category Filters -->
+      <div class="filter-bar" id="filterBar" role="tablist" aria-label="Filter projects by category">
+        <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">All Projects</button>
+        <button class="filter-btn" data-filter="pentesting" role="tab" aria-selected="false">🔓 Penetration Testing</button>
+        <button class="filter-btn" data-filter="forensics" role="tab" aria-selected="false">🔍 Digital Forensics</button>
+        <button class="filter-btn" data-filter="soc" role="tab" aria-selected="false">🛰️ SOC / Detection</button>
+        <button class="filter-btn" data-filter="software" role="tab" aria-selected="false">💻 Software</button>
+      </div>
+
+      <!-- Flagship Project: Metasploitable2 -->
+      <div class="project-card project-card-featured" data-category="pentesting">
+        <span class="project-tag">Flagship Case Study</span>
+        <span class="project-category-badge cat-pentesting">Penetration Testing</span>
+        <div class="project-card-inner">
+          <a href="metasploitable2-case-study.html" class="project-thumb">
+            <img src="assets/metasploitable2/thumb-meterpreter.png" alt="Meterpreter session opened on Metasploitable2 via Metasploit" />
+          </a>
+          <div class="project-body">
+            <h3>Metasploitable2 Vulnerability Assessment &amp; Exploitation</h3>
+            <p>
+              Full penetration testing case study: reconnaissance, CVSS-based risk
+              prioritisation, multi-vector exploitation, persistence, and password
+              cracking against an intentionally vulnerable Linux target.
+            </p>
+            <ul class="project-highlights">
+              <li>8+ CVEs identified &amp; scored (CVSS 7.5–10.0)</li>
+              <li>Root compromise via 2 independent attack paths</li>
+              <li>Persistence + credential recovery (Ophcrack &amp; CrackStation)</li>
+            </ul>
+            <div class="project-buttons">
+              <a href="metasploitable2-case-study.html" class="project-button">Read Full Case Study</a>
+              <a href="Metasploitable2_Vulnerability_Assessment.pdf" target="_blank" class="project-button project-button-outline">Download PDF</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project: MegaCorpOne -->
+      <div class="project-card" data-category="pentesting">
+        <span class="project-category-badge cat-pentesting">Penetration Testing</span>
+        <div class="project-card-inner">
+          <a href="MegaCorpOne_Penetration_Testing_Report__summary_version_.pdf" target="_blank" class="project-thumb">
+            <img src="assets/megacorpone/thumb-nmap-scan.png" alt="Nmap scan results from the MegaCorpOne penetration test" />
+          </a>
+          <div class="project-body">
+            <h3>MegaCorpOne Penetration Testing Report</h3>
+            <p>
+              Summary version of a simulated penetration test: OSINT/Google dorking
+              recon, Nmap/Zenmap enumeration, VSFTPD backdoor exploitation via
+              Metasploit, password cracking with John the Ripper, and persistence
+              via a planted SSH user.
+            </p>
+            <div class="project-buttons">
+              
+                href="MegaCorpOne_Penetration_Testing_Report__summary_version_.pdf"
+                target="_blank"
+                class="project-button"
+              >
+                View PDF Report
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project: SSH Brute Force Detection -->
+      <div class="project-card" data-category="soc">
+        <span class="project-category-badge cat-soc">SOC / Detection</span>
+        <div class="project-card-inner">
+          <a href="SSH_BruteForce_Detection.pdf" target="_blank" class="project-thumb">
+            <img src="assets/sshbruteforce/thumb-dashboard.png" alt="Splunk dashboard detecting an SSH brute-force attack in real time" />
+          </a>
+          <div class="project-body">
+            <h3>SSH Brute-Force Detection (Red Team / Blue Team)</h3>
+            <p>
+              Detected SSH brute-force attacks using Metasploit, Splunk, and custom
+              SPL queries — simulating the attack with Metasploit's <code>ssh_login</code>
+              module, then building real-time detection, a monitoring dashboard, and
+              an automated alert in Splunk.
+            </p>
+            <div class="project-buttons">
+              
+                href="SSH_BruteForce_Detection.pdf"
+                target="_blank"
+                class="project-button"
+              >
+                View PDF Report
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project: Guess My Number -->
+      <div class="project-card" data-category="software">
+        <span class="project-category-badge cat-software">Software</span>
+        <div class="project-card-inner">
+          <div class="project-body project-body-full">
+            <h3>Guess My Number Game</h3>
+            <p>A fun number guessing game built with HTML, CSS, and JavaScript.</p>
+            <div class="project-buttons">
+              
+                href="https://github.com/HadisPazhand/Guess-My-Number-"
+                target="_blank"
+                class="project-button"
+                >View Code on GitHub</a
+              >
+              
+                href="https://hadispazhand.github.io/Guess-My-Number-/"
+                target="_blank"
+                class="project-button project-button-outline"
+                >Play Live Demo</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forensics placeholder — remove this whole div once you add a real forensics project -->
+      <div class="project-card project-card-placeholder" data-category="forensics">
+        <span class="project-category-badge cat-forensics">Digital Forensics</span>
+        <div class="project-body project-body-full">
+          <h3>Digital Forensics Case Studies — Coming Soon</h3>
+          <p>
+            Evidence acquisition, chain of custody, disk/memory analysis, and
+            timeline reconstruction write-ups are currently in progress. Check
+            back soon.
+          </p>
+        </div>
+      </div>
+
+      <p class="no-results" id="noResults" style="display:none;">No projects in this category yet — check back soon.</p>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2025 Hadis Pazhand</p>
+        <div class="social-links">
+          <a href="https://github.com/HadisPazhand" target="_blank">GitHub</a> |
+          <a href="https://www.linkedin.com/in/hadis-pazhand-5264311b1/" target="_blank">LinkedIn</a> |
+          <a href="https://www.instagram.com" target="_blank">Instagram</a>
+        </div>
+      </div>
+    </footer>
+  
+    <script>
+      const navToggle = document.getElementById('navToggle');
+      const siteNav = document.getElementById('siteNav');
+      if (navToggle && siteNav) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = siteNav.classList.toggle('nav-open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const projectCards = document.querySelectorAll('.project-card');
+      const noResults = document.getElementById('noResults');
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+
+          const filter = btn.getAttribute('data-filter');
+          let visibleCount = 0;
+
+          projectCards.forEach(card => {
+            const category = card.getAttribute('data-category');
+            const show = filter === 'all' || category === filter;
+            card.style.display = show ? '' : 'none';
+            if (show) visibleCount++;
+          });
+
+          noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+      });
+    </script>
+  </body>
+</html>
