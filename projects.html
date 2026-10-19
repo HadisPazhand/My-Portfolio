@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Projects | Hadis Pazhand</title>
-    <meta name="description" content="Cybersecurity projects by Hadis Pazhand — penetration testing case studies, digital forensics, SOC/SIEM detection labs, and hands-on security work." />
+    <meta name="description" content="Cybersecurity projects by Hadis Pazhand, covering penetration testing case studies, digital forensics, SOC/SIEM detection labs, and hands-on security work." />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -16,9 +16,9 @@
           <p class="subtitle">Cybersecurity Student & IT Enthusiast</p>
         </div>
         <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="nav" id="siteNav">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="nav" id="siteNav">
           <a href="index.html" class="nav-link">Home</a>
           <a href="about.html" class="nav-link">About</a>
           <a href="projects.html" class="nav-link active">Projects</a>
@@ -30,7 +30,7 @@
     <main class="container">
       <h2 class="page-title">Projects</h2>
       <p class="page-intro">
-        Hands-on offensive and defensive security labs — from full penetration
+        Hands-on offensive and defensive security labs, from full penetration
         testing engagements to SOC-style detection builds and digital forensics
         casework. Each write-up covers the real methodology, tools, and evidence
         behind the result.
@@ -89,13 +89,7 @@
               via a planted SSH user.
             </p>
             <div class="project-buttons">
-              
-                href="MegaCorpOne_Penetration_Testing_Report__summary_version_.pdf"
-                target="_blank"
-                class="project-button"
-              >
-                View PDF Report
-              </a>
+              <a href="MegaCorpOne_Penetration_Testing_Report__summary_version_.pdf" target="_blank" class="project-button">View PDF Report</a>
             </div>
           </div>
         </div>
@@ -112,18 +106,31 @@
             <h3>SSH Brute-Force Detection (Red Team / Blue Team)</h3>
             <p>
               Detected SSH brute-force attacks using Metasploit, Splunk, and custom
-              SPL queries — simulating the attack with Metasploit's <code>ssh_login</code>
-              module, then building real-time detection, a monitoring dashboard, and
+              SPL queries. Simulated the attack with Metasploit's <code>ssh_login</code>
+              module, then built real-time detection, a monitoring dashboard, and
               an automated alert in Splunk.
             </p>
             <div class="project-buttons">
-              
-                href="SSH_BruteForce_Detection.pdf"
-                target="_blank"
-                class="project-button"
-              >
-                View PDF Report
-              </a>
+              <a href="SSH_BruteForce_Detection.pdf" target="_blank" class="project-button">View PDF Report</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project: Digital Forensics (edit the title, paragraph, PDF name and image path) -->
+      <div class="project-card" data-category="forensics">
+        <span class="project-category-badge cat-forensics">Digital Forensics</span>
+        <div class="project-card-inner">
+          <a href="DFIR_Case_Study.pdf" target="_blank" class="project-thumb">
+            <img src="assets/DFIR/thumb-dashboard.png" alt="Forensic investigation screenshot" />
+          </a>
+          <div class="project-body">
+            <h3>Digital Forensics Investigation Case Study</h3>
+            <p>
+              Short description of your investigation goes here.
+            </p>
+            <div class="project-buttons">
+              <a href="DFIR_Case_Study.pdf" target="_blank" class="project-button">View PDF Report</a>
             </div>
           </div>
         </div>
@@ -137,37 +144,14 @@
             <h3>Guess My Number Game</h3>
             <p>A fun number guessing game built with HTML, CSS, and JavaScript.</p>
             <div class="project-buttons">
-              
-                href="https://github.com/HadisPazhand/Guess-My-Number-"
-                target="_blank"
-                class="project-button"
-                >View Code on GitHub</a
-              >
-              
-                href="https://hadispazhand.github.io/Guess-My-Number-/"
-                target="_blank"
-                class="project-button project-button-outline"
-                >Play Live Demo</a
-              >
+              <a href="https://github.com/HadisPazhand/Guess-My-Number-" target="_blank" class="project-button">View Code on GitHub</a>
+              <a href="https://hadispazhand.github.io/Guess-My-Number-/" target="_blank" class="project-button project-button-outline">Play Live Demo</a>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Forensics placeholder — remove this whole div once you add a real forensics project -->
-      <div class="project-card project-card-placeholder" data-category="forensics">
-        <span class="project-category-badge cat-forensics">Digital Forensics</span>
-        <div class="project-body project-body-full">
-          <h3>Digital Forensics Case Studies — Coming Soon</h3>
-          <p>
-            Evidence acquisition, chain of custody, disk/memory analysis, and
-            timeline reconstruction write-ups are currently in progress. Check
-            back soon.
-          </p>
-        </div>
-      </div>
-
-      <p class="no-results" id="noResults" style="display:none;">No projects in this category yet — check back soon.</p>
+      <p class="no-results" id="noResults" style="display:none;">No projects in this category yet. Check back soon.</p>
     </main>
 
     <footer class="site-footer">
@@ -180,7 +164,7 @@
         </div>
       </div>
     </footer>
-  
+
     <script>
       const navToggle = document.getElementById('navToggle');
       const siteNav = document.getElementById('siteNav');
